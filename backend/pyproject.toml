@@ -1,0 +1,9 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "TRY", "FURB"]
+ignore = ["B008", "TRY003", "TRY004"]
+[tool.ruff.lint.per-file-ignores]
+"migrations/versions/*.py" = ["UP035", "UP007"]
