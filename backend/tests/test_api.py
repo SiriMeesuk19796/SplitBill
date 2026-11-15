@@ -100,8 +100,25 @@ def test_repeated_idempotency_key_returns_same_expense(client,db_session,):
 
 
 def test_non_payer_cannot_delete_expense(client):
+    # Alice สร้างบิลและเป็นผู้จ่าย
+    create_response = client.post(
+        "/groups/1/expenses",
+        headers={"X-User": "alice"},
+        json={
+            "description": "Delete Permission Test",
+            "amount": "100.00",
+            "payer": "alice",
+            "split_type": "equal",
+            "split_members": ["alice", "bob"],
+        },
+    )
+
+    assert create_response.status_code == 201
+    expense_id = create_response.json()["id"]
+
+    # Bob พยายามลบบิลที่ Alice เป็นผู้จ่าย
     response = client.delete(
-        "/groups/1/expenses/1",
+        f"/groups/1/expenses/{expense_id}",
         headers={"X-User": "bob"},
     )
 

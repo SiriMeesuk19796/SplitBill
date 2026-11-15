@@ -3,23 +3,22 @@
 Revision ID: 90b5436d459f
 Revises: fe277b15aff9
 Create Date: 2026-11-15 17:06:30.879304
-
 """
+
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
-
-# revision identifiers, used by Alembic.
-revision: str = '90b5436d459f'
-down_revision: Union[str, Sequence[str], None] = 'fe277b15aff9'
+# Revision identifiers used by Alembic.
+revision: str = "90b5436d459f"
+down_revision: Union[str, Sequence[str], None] = "fe277b15aff9"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # 1. เพิ่ม Column แบบ nullable ชั่วคราว
+    # Add the creator column as nullable first.
     op.add_column(
         "expenses",
         sa.Column(
@@ -29,7 +28,7 @@ def upgrade() -> None:
         ),
     )
 
-    # 2. กำหนด Creator ของบิลเก่าให้เท่ากับ Payer
+    # Backfill existing expenses using the payer as the creator.
     op.execute(
         """
         UPDATE expenses
@@ -37,7 +36,7 @@ def upgrade() -> None:
         """
     )
 
-    # 3. เพิ่ม Foreign Key
+    # Add the foreign key constraint.
     op.create_foreign_key(
         "fk_expenses_created_by_id_users",
         "expenses",
@@ -46,7 +45,7 @@ def upgrade() -> None:
         ["id"],
     )
 
-    # 4. เปลี่ยน Column เป็น NOT NULL
+    # Make the creator column non-nullable.
     op.alter_column(
         "expenses",
         "created_by_id",
@@ -56,12 +55,12 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    # 1. ลบ Foreign Key
+    # Remove the foreign key constraint.
     op.drop_constraint(
         "fk_expenses_created_by_id_users",
         "expenses",
         type_="foreignkey",
     )
 
-    # 2. ลบ Column
+    # Remove the creator column.
     op.drop_column("expenses", "created_by_id")

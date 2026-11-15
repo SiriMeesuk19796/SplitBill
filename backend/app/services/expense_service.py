@@ -192,6 +192,7 @@ def create_expense(
         return expense
 
 
+
 def delete_expense(
     db: Session,
     group_id: int,
@@ -206,13 +207,11 @@ def delete_expense(
         )
     )
 
-    if (
-        expense.payer_id != requester_id
-        and expense.created_by_id != requester_id
-    ):
-        raise PermissionError(
-            "Only the creator or payer can delete this expense"
-        )
+    if expense is None:
+        raise ValueError("Expense not found")
+
+    if expense.payer_id != requester_id:
+        raise PermissionError("Only the payer can delete this expense")
 
     expense.deleted_at = datetime.now(UTC)
 

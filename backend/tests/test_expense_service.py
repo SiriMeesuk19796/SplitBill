@@ -80,6 +80,7 @@ def test_repeated_idempotency_key_returns_existing_expense(db_session):
     first_expense = create_expense(
         db=db_session,
         group_id=1,
+        creator_id=alice.id,
         description="Idempotency Test",
         amount=Decimal("100.00"),
         payer="alice",
@@ -92,6 +93,7 @@ def test_repeated_idempotency_key_returns_existing_expense(db_session):
     second_expense = create_expense(
         db=db_session,
         group_id=1,
+        creator_id=alice.id,
         description="Different Description",
         amount=Decimal("200.00"),
         payer="alice",
@@ -117,10 +119,20 @@ def test_repeated_idempotency_key_returns_existing_expense(db_session):
 
 
 def test_only_payer_can_delete_expense(db_session):
-    # สร้าง Expense สำหรับทดสอบ
+    alice = db_session.scalar(
+        select(User).where(User.username == "alice")
+    )
+    bob = db_session.scalar(
+        select(User).where(User.username == "bob")
+    )
+
+    assert alice is not None
+    assert bob is not None
+
     expense = create_expense(
         db=db_session,
         group_id=1,
+        creator_id=alice.id,
         description="Delete Permission Test",
         amount=Decimal("100.00"),
         payer="alice",
@@ -129,16 +141,6 @@ def test_only_payer_can_delete_expense(db_session):
         exact_splits={},
         idempotency_key="pytest-delete-permission-001",
     )
-
-    bob = db_session.scalar(
-        select(User).where(User.username == "bob")
-    )
-    alice = db_session.scalar(
-        select(User).where(User.username == "alice")
-    )
-
-    assert bob is not None
-    assert alice is not None
 
     # Bob ไม่ใช่ Payer จึงไม่มีสิทธิ์ลบ
     with pytest.raises(PermissionError):
