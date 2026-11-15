@@ -55,3 +55,8 @@ class Expense(Base):
         DateTime(timezone=True),
         nullable=True,
     )
+
+    created_by_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+    )

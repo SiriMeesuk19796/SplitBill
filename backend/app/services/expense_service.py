@@ -114,6 +114,7 @@ def create_expense(
     split_type: str,
     split_members: list[str],
     exact_splits: dict[str, Decimal],
+    creator_id: int,
     idempotency_key: str | None = None,
 ) -> Expense:
     if idempotency_key:
@@ -148,6 +149,7 @@ def create_expense(
         description=description,
         amount=amount,
         payer_id=user_map[payer],
+        created_by_id=creator_id,
         idempotency_key=idempotency_key,
     )
 
@@ -204,11 +206,13 @@ def delete_expense(
         )
     )
 
-    if expense is None:
-        raise ValueError("Expense not found")
-
-    if expense.payer_id != requester_id:
-        raise PermissionError("Only the payer can delete this expense")
+    if (
+        expense.payer_id != requester_id
+        and expense.created_by_id != requester_id
+    ):
+        raise PermissionError(
+            "Only the creator or payer can delete this expense"
+        )
 
     expense.deleted_at = datetime.now(UTC)
 

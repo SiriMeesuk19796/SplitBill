@@ -86,6 +86,7 @@ class ExpenseResponse(BaseModel):
     description: str
     amount: Decimal
     payer: str
+    created_by: str
     splits: list[ExpenseSplitResponse]
 
     model_config = ConfigDict(from_attributes=True)

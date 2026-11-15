@@ -134,6 +134,7 @@ def add_expense(
             split_type=request.split_type,
             split_members=request.split_members,
             exact_splits=exact_splits,
+            creator_id=user.id,
             idempotency_key=idempotency_key,
         )
 
@@ -147,6 +148,13 @@ def add_expense(
     payer_name = db.scalar(
         select(User.username).where(
             User.id == expense.payer_id
+        )
+    )
+
+    # 5.1 ดึงชื่อผู้สร้างบิล
+    creator_name = db.scalar(
+        select(User.username).where(
+            User.id == expense.created_by_id
         )
     )
 
@@ -166,6 +174,7 @@ def add_expense(
         "description": expense.description,
         "amount": expense.amount,
         "payer": payer_name,
+        "created_by": creator_name,
         "splits": [
             {
                 "username": row.username,
@@ -230,6 +239,13 @@ def get_expenses(
             )
         )
 
+        # ดึงชื่อผู้สร้างบิล
+        creator_name = db.scalar(
+            select(User.username).where(
+                User.id == expense.created_by_id
+            )
+        )
+
         split_rows = db.execute(
             select(User.username, ExpenseSplit.amount)
             .join(
@@ -244,6 +260,7 @@ def get_expenses(
             "description": expense.description,
             "amount": expense.amount,
             "payer": payer_name,
+            "created_by": creator_name,
             "splits": [
                 {
                     "username": row.username,
