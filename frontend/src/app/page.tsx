@@ -540,7 +540,7 @@ export default function Home() {
       }`}
     >
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
           <div>
             <h1 className="text-2xl font-bold text-indigo-600">
               SplitBill
@@ -550,7 +550,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <label className="text-sm font-medium">
               {translations[language].language}
             </label>
@@ -574,7 +574,7 @@ export default function Home() {
               id="user"
               value={selectedUser}
               onChange={(event) => changeUser(event.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2"
+              className="max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
             >
               {Object.keys(userProfiles).map((user) => (
                 <option key={user} value={user}>
@@ -586,7 +586,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl space-y-8 px-6 py-8">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:space-y-8 sm:px-6 sm:py-8">
         <section>
           <h2 className="mb-3 text-lg font-semibold">
             {translations[language].selectGroup}
@@ -595,7 +595,7 @@ export default function Home() {
             value={selectedGroup}
             onChange={(event) => handleGroupChange(event.target.value)}
             disabled={isLoadingGroups || groups.length === 0}
-            className="w-full max-w-sm rounded-lg border border-slate-300 bg-white px-4 py-3 disabled:bg-slate-100"
+            className="max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
           >
             {isLoadingGroups ? (
               <option value="">Loading groups...</option>
@@ -652,7 +652,7 @@ export default function Home() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="mb-5 text-lg font-semibold">
               {translations[language].addExpense}
             </h2>
@@ -693,7 +693,7 @@ export default function Home() {
                 <select
                   value={payer}
                   onChange={(event) => setPayer(event.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2"
+                  className="max-w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
                 >
                   {availableMembers.map((user) => (
                     <option key={user} value={user}>
@@ -838,7 +838,7 @@ export default function Home() {
               )}
             </div>
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
             <h2 className="mb-4 text-lg font-semibold">
               {translations[language].expenseHistory}
             </h2>
