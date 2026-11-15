@@ -846,9 +846,7 @@ export default function Home() {
             <div className="space-y-3">
               {expenses.map((expense) => {
                 const isExpanded = expandedExpenseId === expense.id;
-                const canDelete =
-                  expense.payer === selectedUser ||
-                  expense.created_by === selectedUser;
+                const canDelete = expense.payer === selectedUser;
 
                 return (
                   <div
