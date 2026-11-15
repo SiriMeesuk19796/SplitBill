@@ -6,6 +6,7 @@ A web application for managing group expenses, splitting bills, and tracking bal
 
 **Frontend**
 - Next.js
+- React
 - TypeScript
 - Tailwind CSS
 
@@ -24,6 +25,12 @@ A web application for managing group expenses, splitting bills, and tracking bal
 SplitBill/
 ├── backend/
 │   ├── app/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── routers/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   └── seed.py
 │   ├── migrations/
 │   ├── tests/
 │   ├── .env.example
@@ -34,119 +41,268 @@ SplitBill/
 ├── frontend/
 │   ├── src/
 │   ├── public/
-│   └── package.json
+│   ├── package.json
+│   └── package-lock.json
 ├── README.md
 └── AI_NOTES.md
 ```
 
-## Features
-
-- Select a user and view their available groups.
-- Create expenses with equal or exact splitting.
-- Preview expense allocations before submission.
-- Track group expenses and member balances.
-- Delete expenses according to payer permissions.
-- Prevent duplicate expense creation using idempotency keys.
-- Support responsive layouts for desktop and mobile.
-
 ## Prerequisites
 
-- Python 3.12+
-- Node.js and npm
-- PostgreSQL 16
+Install the following software before setting up the project:
 
-## Backend Setup
+| Software | Requirement |
+|---|---|
+| Python | 3.12 or newer |
+| Node.js | LTS version |
+| npm | Included with Node.js |
+| PostgreSQL | 16 |
+| Git | Required to clone the repository |
 
-Open a terminal in the `backend` directory.
+Verify the installations:
 
-### 1. Create and activate a virtual environment
+```powershell
+python --version
+node --version
+npm --version
+git --version
+```
+
+## 1. Clone the Repository
+
+Open PowerShell and run:
+
+```powershell
+git clone https://github.com/SiriMeesuk19796/SplitBill.git
+cd SplitBill
+```
+
+## 2. Set Up PostgreSQL
+
+Make sure the PostgreSQL service is running.
+
+Create a database named `splitbill` before configuring the backend.
+
+### Option A: Using pgAdmin
+
+1. Open pgAdmin.
+2. Connect to your PostgreSQL server.
+3. Expand the Servers section.
+4. Right-click Databases.
+5. Select Create → Database.
+6. Enter `splitbill` as the database name.
+7. Save.
+
+### Option B: Using PostgreSQL SQL Shell (psql)
+
+Connect to PostgreSQL using your PostgreSQL username, then execute:
+
+```sql
+CREATE DATABASE splitbill;
+```
+
+Verify that the database exists:
+
+```sql
+SELECT datname FROM pg_database WHERE datname = 'splitbill';
+```
+
+## 3. Set Up the Backend
+
+Open a new PowerShell terminal in the project root directory.
+
+Navigate to the backend:
+
+```powershell
+cd backend
+```
+
+### 3.1 Create a Virtual Environment
 
 ```powershell
 python -m venv .venv
+```
+
+Activate the virtual environment:
+
+```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-### 2. Install dependencies
+If PowerShell blocks script execution, run the following command once:
 
 ```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+Then activate the environment again.
+
+### 3.2 Install Dependencies
+
+```powershell
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 3. Configure environment variables
+### 3.3 Configure Environment Variables
 
-Copy `.env.example` to `.env` and update the database connection string.
+Copy the example environment file:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Example:
+Open `.env` and update the database connection string:
 
 ```env
-DATABASE_URL=postgresql+psycopg://postgres:password@localhost:5432/splitbill
+DATABASE_URL=postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/splitbill
 ```
 
-Create the PostgreSQL database named `splitbill` before continuing.
+Replace:
+- `postgres` with your PostgreSQL username if different.
+- `YOUR_PASSWORD` with your actual PostgreSQL password.
+- `localhost:5432` if your PostgreSQL server uses a different host or port.
 
-### 4. Run database migrations
+Do not commit `.env` to Git. The file is excluded through `.gitignore`.
+
+### 3.4 Run Database Migrations
+
+Make sure you are still in the `backend` directory and your virtual environment is activated.
+
+Run:
 
 ```powershell
 alembic upgrade head
 ```
 
-### 5. Seed initial data
+This creates the required database tables using the project's Alembic migrations.
+
+### 3.5 Seed Initial Data
+
+Run:
 
 ```powershell
 python -m app.seed
 ```
 
-### 6. Start the backend server
+The seed script creates the initial users, groups, and group memberships if they do not already exist.
+
+Initial users:
+
+| Username | Display Name |
+|---|---|
+| alice | Alice |
+| bob | Bob |
+| carol | Carol |
+| dan | Dan |
+
+Initial groups:
+
+| Group | Members |
+|---|---|
+| Chiang Mai trip | alice, bob, carol |
+| Office lunch | bob, dan |
+
+### 3.6 Start the Backend Server
 
 ```powershell
 uvicorn main:app --reload
 ```
 
-Backend API: `http://127.0.0.1:8000`
+The backend should now be available at:
 
-API documentation: `http://127.0.0.1:8000/docs`
+- API: http://127.0.0.1:8000
+- API Documentation: http://127.0.0.1:8000/docs
+- Health Check: http://127.0.0.1:8000/health
 
-## Frontend Setup
+Verify the backend by opening:
 
-Open another terminal in the `frontend` directory.
+http://127.0.0.1:8000/health
 
-### 1. Install dependencies
+Expected response:
+
+```json
+{
+  "status": "healthy",
+  "application": "SplitBill API"
+}
+```
+
+Keep this terminal running while using the frontend.
+
+## 4. Set Up the Frontend
+
+Open a second PowerShell terminal in the project root directory.
+
+Navigate to the frontend:
+
+```powershell
+cd frontend
+```
+
+### 4.1 Install Dependencies
 
 ```powershell
 npm install
 ```
 
-### 2. Start the development server
+### 4.2 Start the Frontend Server
 
 ```powershell
 npm run dev
 ```
 
-Frontend: `http://localhost:3000`
+The frontend should now be available at:
 
-## Running Tests and Code Quality Checks
+http://localhost:3000
 
-Run backend tests from the `backend` directory:
+Make sure the backend server is running at the same time.
+
+## 5. Running Tests and Code Quality Checks
+
+### Backend Tests
+
+Open a PowerShell terminal in the `backend` directory and activate the virtual environment.
+
+Run:
 
 ```powershell
 python -m pytest -v
 ```
 
-Run Ruff:
+### Python Code Quality Check
+
+From the `backend` directory:
 
 ```powershell
 python -m ruff check .
 ```
 
-Run frontend lint from the `frontend` directory:
+### Frontend Lint
+
+Open a PowerShell terminal in the `frontend` directory:
 
 ```powershell
 npm run lint
 ```
+
+### Frontend Production Build
+
+From the `frontend` directory:
+
+```powershell
+npm run build
+```
+
+## Features
+
+- Select a user and view their available groups.
+- Create expenses using equal or exact splitting.
+- Preview expense allocations before submission.
+- Track group expenses and member balances.
+- Delete expenses according to payer permissions.
+- Prevent duplicate expense creation using idempotency keys.
+- Support responsive layouts for desktop and mobile.
 
 ## Key Design Decisions
 
