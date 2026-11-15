@@ -172,7 +172,12 @@ The sum of all member allocations must exactly match the expense amount. Otherwi
 
 ### Group Access Control
 
-Only members of a group can access or modify that group's data. Unauthorized access returns an HTTP error without exposing group information.
+Only members of a group can access or modify that group's data.
+
+- HTTP 404 is returned when a group does not exist or the requesting user is not a member.
+- HTTP 403 is returned when a non-payer attempts to delete an expense.
+
+Returning 404 for non-members prevents exposing whether a group exists.
 
 ### Idempotency
 
