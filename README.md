@@ -197,4 +197,4 @@ Expenses cannot be edited. Deletion is handled as a soft delete so the record is
 
 ## Development Time
 
-Approximate development time: [Fill in actual time spent].
+Approximate development time: 1.5 days.
